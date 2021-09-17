@@ -3,7 +3,7 @@ package ua.lysenko.springhorserace.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.lysenko.springhorserace.entities.Bet;
-import ua.lysenko.springhorserace.entities.Counter;
+import ua.lysenko.springhorserace.services.Counter;
 import ua.lysenko.springhorserace.entities.RaceModel;
 import ua.lysenko.springhorserace.repositories.RaceModelRepository;
 import ua.lysenko.springhorserace.services.RaceService;
@@ -17,11 +17,13 @@ import java.util.concurrent.ExecutionException;
 public class RaceController {
     private final RaceService raceService;
     private final RaceModelRepository raceModelRepository;
+    private final Counter counter;
 
     @Autowired
-    public RaceController(RaceService raceService, RaceModelRepository raceModelRepository) {
+    public RaceController(RaceService raceService, RaceModelRepository raceModelRepository, Counter counter) {
         this.raceService = raceService;
         this.raceModelRepository = raceModelRepository;
+        this.counter = counter;
     }
 
     @GetMapping("/{id}")
@@ -47,11 +49,11 @@ public class RaceController {
     @PostMapping("/start")
     public String startRace(@RequestParam long quantity,
                             @RequestParam long chosen) throws ExecutionException, InterruptedException {
-        Counter.incrementCounter();
+        counter.incrementCounter();
         Bet bet = new Bet();
         bet.setQuantity(quantity);
         bet.setChosen(chosen);
         raceService.start(bet);
-        return "Race finished, results available at 'localhost:8080/race/" + Counter.getCounter();
+        return "Race finished, results available at 'localhost:8080/race/" + counter.getCounter();
     }
 }

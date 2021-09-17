@@ -16,10 +16,12 @@ import java.util.concurrent.Future;
 @Service
 public class RaceService {
     private final RaceModelRepository raceModelRepository;
+    private final Counter counter;
 
     @Autowired
-    public RaceService(RaceModelRepository raceModelRepository) {
+    public RaceService(RaceModelRepository raceModelRepository, Counter counter) {
         this.raceModelRepository = raceModelRepository;
+        this.counter = counter;
     }
 
     public void start(Bet bet) throws InterruptedException, ExecutionException {
@@ -48,9 +50,9 @@ public class RaceService {
         executor.shutdown();
     }
 
-    private static RaceModel horseToModel(Horse horse, LocalDate localDate, Bet bet) {
+    private RaceModel horseToModel(Horse horse, LocalDate localDate, Bet bet) {
         RaceModel model = new RaceModel();
-        model.setRaceId(Counter.getCounter());
+        model.setRaceId(counter.getCounter());
         model.setHorseId(horse.getNumber());
         model.setResult(horse.getResultTime());
         model.setPosition(horse.getPosition());
